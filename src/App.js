@@ -34,7 +34,6 @@ import {
 } from 'aws-amplify';
 
 import awsconfig from './aws-exports';
-import { random, result } from 'lodash';
 
 Amplify.configure(awsconfig);
 
@@ -44,8 +43,9 @@ Amplify.configure(aws_exports);
 
 async function getUser() {
   let user = await Auth.currentAuthenticatedUser();
-
+  console.log(user);
   const { username } = user;
+  console.log(username);
   return username
 }
 
@@ -58,65 +58,110 @@ function checkUser() {
 }
 
 
-function getData() {
+async function getData() {
   const apiName = "restApiTest";
   const path = "/restApiTestPath";
   const myInit = { // OPTIONAL
     headers: {}, // OPTIONAL
   };
 
-  return API.get(apiName, path, myInit);
+  return await API.get(apiName, path, myInit);
 }
 
-async function postData() {
+
+function getDownload() {
   const apiName = "restApiTest";
   const path = "/restApiTestPath";
   const myInit = { // OPTIONAL
-    body: { id: "11121321321656464" + random().toString, name: "Test" }, // replace this with attributes you need
+    headers: {}, // OPTIONAL
+    response: true, // OPTIONAL (return the entire Axios response object instead of only response.data)
+    queryStringParameters: {  // OPTIONAL
+      name: 'Test202110181634613220656',
+    },
+  };
+
+  API.get(apiName, path, myInit).then(response => {
+    console.log(response);
+  }).catch(error => { console.log(error.response); });
+}
+
+function postData(state) {
+  const apiName = "restApiTest";
+  const path = "/restApiTestPath";
+  var today = new Date();
+  const myInit = { // OPTIONAL
+    body: state,
+    //body: { name: username, date: "Test" + today.getFullYear() + (today.getMonth() + 1) + today.getDate() + today.getTime(), userId: "LocalHost" }, // replace this with attributes you need
     headers: {}, // OPTIONAL
   };
 
-  return await API.post(apiName, path, myInit).then(obj => console.log(obj), err => console.log(err));
+  return API.post(apiName, path, myInit).then(obj => console.log(obj), err => console.log(err));
 }
 
 
 
 class App extends Component {
 
+  constructor(props) {
+    super(props);
+
+    this.state = {}
+
+    this.newState = {}
+
+  }
+
+  componentDidMount() {
+    this.getUserSigned().then(result => this.setState({ username: result }))
+  }
+
+  async getUserSigned() {
+    let user = await Auth.currentAuthenticatedUser();
+    //console.log(user);
+    const { username } = user;
+    //console.log(username);
+    return username
+  }
+
+
+  updateInputValue(field, evt) {
+    this.setState({
+      [field]: evt.target.value
+    });
+  }
+
+
+
+
   uploadText = () => {
     console.log("Click");
-    postData();
+    postData(this.state);
 
   }
 
   downloadTest = () => {
-    API.get("restApiTest", "/restApiTestPath", {}).then(obj => {console.log(result)}, err => {console.log(err)});
-  };
+    getDownload();
 
+  }
 
 
   render() {
-    const appUser = (getUser().then(value => { return value.toString(); })).toString();
-    console.log(appUser);
+    //const appUser = getUser();
+    //console.log(appUser);
     return (
       <div className="App">
         <AmplifySignOut />
-        <header className="App-header">
-          <img src={"https://i.imgur.com/JDGexVo.jpeg"} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://github.com/DanielGlezca/create-react-app-auth-amplify.git"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React now!!
-          </a>
+        <header className="App-header">          <a
+          className="App-link"
+          href="https://github.com/DanielGlezca/create-react-app-auth-amplify.git"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React now!!
+        </a>
           <AmplifyAuthenticator>
             <div class="Welcome">
-              <h1> Hello {appUser}</h1>
+              <h1> Hello {this.state.username}</h1>
 
             </div>
           </AmplifyAuthenticator>
@@ -136,31 +181,31 @@ class App extends Component {
             />
             <FormControl>
               <FormLabel>Pregunta 1</FormLabel>
-              <Input />
+              <Input onChange={evt => this.updateInputValue("field1", evt)} />
               <FormHelperText>Se esperan numeros</FormHelperText>
               <FormErrorMessage>Error message</FormErrorMessage>
             </FormControl>
             <FormControl>
               <FormLabel>Pregunta 2</FormLabel>
-              <Input />
+              <Input onChange={evt => this.updateInputValue("field2", evt)} />
               <FormHelperText>Decimales</FormHelperText>
               <FormErrorMessage>Error message</FormErrorMessage>
             </FormControl>
-            <FormControl>
+            <FormControl isRequired>
               <FormLabel>Pregunta 3</FormLabel>
-              <Input />
+              <Input onChange={evt => this.updateInputValue("field3", evt)} />
               <FormHelperText>Se espera texto</FormHelperText>
               <FormErrorMessage>Error message</FormErrorMessage>
             </FormControl>
             <InputGroup>
               <InputLeftAddon color="gray.500">Telefono</InputLeftAddon>
-              <Input />
+              <Input onChange={evt => this.updateInputValue("telefono", evt)} />
               <FormHelperText>Telefono</FormHelperText>
             </InputGroup>
             <NumberInput opacity={1} />
             <FormControl>
               <FormLabel>Pregunta 4</FormLabel>
-              <Input />
+              <Input onChange={evt => this.updateInputValue("field4", evt)} />
               <FormHelperText>Se esperan nombre</FormHelperText>
               <FormErrorMessage>Error message</FormErrorMessage>
             </FormControl>
