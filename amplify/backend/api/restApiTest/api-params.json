@@ -1,0 +1,45 @@
+{
+  "paths": [
+    {
+      "name": "/restApiTestPath",
+      "lambdaFunction": "restApiTestLambda",
+      "privacy": {
+        "protected": true,
+        "auth": [
+          "/POST",
+          "/GET",
+          "/PUT",
+          "/PATCH",
+          "/DELETE"
+        ],
+        "unauth": [
+          "/GET"
+        ]
+      },
+      "policyResourceName": "/restApiTestPath"
+    }
+  ],
+  "resourceName": "restApiTest",
+  "apiName": "restApiTest",
+  "functionArns": [
+    {
+      "lambdaFunction": "restApiTestLambda"
+    }
+  ],
+  "privacy": {
+    "auth": 1,
+    "unauth": 1,
+    "authRoleName": "amplify-authcra-devl-154456-authRole",
+    "unAuthRoleName": "amplify-authcra-devl-154456-unauthRole"
+  },
+  "dependsOn": [
+    {
+      "category": "function",
+      "resourceName": "restApiTestLambda",
+      "attributes": [
+        "Name",
+        "Arn"
+      ]
+    }
+  ]
+}

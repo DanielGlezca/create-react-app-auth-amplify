@@ -14,6 +14,12 @@
     "categories": {
       "auth": {
         "cognitocf0c6096": {}
+      },
+      "function": {
+        "restApiTestLambda": {
+          "deploymentBucketName": "amplify-authcra-devl-154456-deployment",
+          "s3Key": "amplify-builds/restApiTestLambda-6d385042426b6a6f3869-build.zip"
+        }
       }
     }
   }
